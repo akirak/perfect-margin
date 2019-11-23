@@ -295,6 +295,10 @@ WIN will be any visible window, including the minimap window."
     (set-window-margins win 0 0)
     (set-window-fringes win 0 0)))
 
+(defun perfect-margin-post-command ()
+  (when (memq this-command '(save-buffer save-some-buffers))
+    (run-with-timer 0.02 nil #'perfect-margin-margin-windows)))
+
 ;;----------------------------------------------------------------------------
 ;; MINOR mode definition
 ;;----------------------------------------------------------------------------
@@ -316,6 +320,7 @@ WIN will be any visible window, including the minimap window."
         (ad-activate 'split-window)
         (add-hook 'window-configuration-change-hook 'perfect-margin-margin-windows)
         (add-hook 'window-size-change-functions 'perfect-margin-margin-frame)
+        (add-hook 'post-command-hook 'perfect-margin-post-command)
         (perfect-margin-margin-windows))
     ;; remove hook and restore margin
     (when (perfect-margin-with-linum-p)
@@ -328,6 +333,7 @@ WIN will be any visible window, including the minimap window."
     (ad-deactivate 'split-window)
     (remove-hook 'window-configuration-change-hook 'perfect-margin-margin-windows)
     (remove-hook 'window-size-change-functions 'perfect-margin-margin-frame)
+    (remove-hook 'post-command-hook 'perfect-margin-post-command)
     (dolist (window (window-list))
       (set-window-margins window 0 0))))
 
