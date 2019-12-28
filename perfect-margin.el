@@ -295,6 +295,11 @@ WIN will be any visible window, including the minimap window."
     (set-window-margins win 0 0)
     (set-window-fringes win 0 0)))
 
+(defadvice split-window-sensibly (before perfect-margin--disable-margins nil)
+  (dolist (win (window-list))
+    (set-window-margins win 0 0)
+    (set-window-fringes win 0 0)))
+
 (defun perfect-margin-post-command ()
   (when (memq this-command '(save-buffer save-some-buffers))
     (run-with-timer 0.02 nil #'perfect-margin-margin-windows)))
@@ -318,6 +323,7 @@ WIN will be any visible window, including the minimap window."
         (when (perfect-margin-with-minimap-p)
           (ad-activate 'minimap-update))
         (ad-activate 'split-window)
+        (ad-activate 'split-window-sensibly)
         (add-hook 'window-configuration-change-hook 'perfect-margin-margin-windows)
         (add-hook 'window-size-change-functions 'perfect-margin-margin-frame)
         (add-hook 'post-command-hook 'perfect-margin-post-command)
@@ -331,6 +337,7 @@ WIN will be any visible window, including the minimap window."
     (when (perfect-margin-with-minimap-p)
       (ad-deactivate 'minimap-update))
     (ad-deactivate 'split-window)
+    (ad-deactivate 'split-window-sensibly)
     (remove-hook 'window-configuration-change-hook 'perfect-margin-margin-windows)
     (remove-hook 'window-size-change-functions 'perfect-margin-margin-frame)
     (remove-hook 'post-command-hook 'perfect-margin-post-command)
